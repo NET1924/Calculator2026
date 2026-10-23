@@ -1,8 +1,16 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { fetchExchangeRates, formatDate, getTimeSinceUpdate, convertCurrency } from '../utils/exchangeRates';
 
 interface UnitConverterProps {
   onBack: () => void;
   onOpenSpec: () => void;
+}
+
+interface ExchangeRates {
+  base: string;
+  date: string;
+  rates: Record<string, number>;
+  lastUpdated: number;
 }
 
 type Category = {
@@ -151,16 +159,16 @@ const categories: Category[] = [
     name: 'Валюта',
     icon: '💱',
     units: [
-      { id: 'usd', name: 'Доллар США', symbol: '$', toBase: v => v, fromBase: v => v },
-      { id: 'eur', name: 'Евро', symbol: '€', toBase: v => v * 1.08, fromBase: v => v / 1.08 },
-      { id: 'rub', name: 'Российский рубль', symbol: '₽', toBase: v => v / 92.5, fromBase: v => v * 92.5 },
-      { id: 'gbp', name: 'Фунт стерлингов', symbol: '£', toBase: v => v * 1.27, fromBase: v => v / 1.27 },
-      { id: 'jpy', name: 'Японская иена', symbol: '¥', toBase: v => v / 156.5, fromBase: v => v * 156.5 },
-      { id: 'cny', name: 'Китайский юань', symbol: '¥', toBase: v => v / 7.25, fromBase: v => v * 7.25 },
-      { id: 'chf', name: 'Швейцарский франк', symbol: 'Fr', toBase: v => v * 1.13, fromBase: v => v / 1.13 },
-      { id: 'cad', name: 'Канадский доллар', symbol: 'C$', toBase: v => v * 0.74, fromBase: v => v / 0.74 },
-      { id: 'aud', name: 'Австралийский доллар', symbol: 'A$', toBase: v => v * 0.66, fromBase: v => v / 0.66 },
-      { id: 'try', name: 'Турецкая лира', symbol: '₺', toBase: v => v / 34.2, fromBase: v => v * 34.2 },
+      { id: 'USD', name: 'Доллар США', symbol: '$', toBase: v => v, fromBase: v => v },
+      { id: 'EUR', name: 'Евро', symbol: '€', toBase: v => v, fromBase: v => v },
+      { id: 'RUB', name: 'Российский рубль', symbol: '₽', toBase: v => v, fromBase: v => v },
+      { id: 'GBP', name: 'Фунт стерлингов', symbol: '£', toBase: v => v, fromBase: v => v },
+      { id: 'JPY', name: 'Японская иена', symbol: '¥', toBase: v => v, fromBase: v => v },
+      { id: 'CNY', name: 'Китайский юань', symbol: '¥', toBase: v => v, fromBase: v => v },
+      { id: 'CHF', name: 'Швейцарский франк', symbol: 'Fr', toBase: v => v, fromBase: v => v },
+      { id: 'CAD', name: 'Канадский доллар', symbol: 'C$', toBase: v => v, fromBase: v => v },
+      { id: 'AUD', name: 'Австралийский доллар', symbol: 'A$', toBase: v => v, fromBase: v => v },
+      { id: 'TRY', name: 'Турецкая лира', symbol: '₺', toBase: v => v, fromBase: v => v },
     ],
   },
 ];
@@ -170,6 +178,27 @@ function UnitConverter({ onBack, onOpenSpec }: UnitConverterProps) {
   const [fromUnit, setFromUnit] = useState<string>('m');
   const [toUnit, setToUnit] = useState<string>('km');
   const [inputValue, setInputValue] = useState<string>('1');
+  const [exchangeRates, setExchangeRates] = useState<ExchangeRates | null>(null);
+  const [ratesLoading, setRatesLoading] = useState<boolean>(false);
+  const [ratesError, setRatesError] = useState<string | null>(null);
+
+  // Загрузка курсов валют при монтировании компонента
+  useEffect(() => {
+    const loadRates = async () => {
+      setRatesLoading(true);
+      setRatesError(null);
+      try {
+        const rates = await fetchExchangeRates();
+        setExchangeRates(rates);
+      } catch (error) {
+        setRatesError('Не удалось загрузить курсы валют');
+        console.error('Error loading exchange rates:', error);
+      } finally {
+        setRatesLoading(false);
+      }
+    };
+    loadRates();
+  }, []);
 
   const currentCategory = useMemo(() => 
     categories.find(c => c.id === selectedCategory) || categories[0],
@@ -187,6 +216,13 @@ function UnitConverter({ onBack, onOpenSpec }: UnitConverterProps) {
     const value = parseFloat(inputValue);
     if (isNaN(value)) return '';
     
+    // Для валют используем API курсы
+    if (selectedCategory === 'currency' && exchangeRates) {
+      const converted = convertCurrency(value, fromUnit, toUnit, exchangeRates);
+      return isNaN(converted) ? '' : formatNumber(converted);
+    }
+    
+    // Для остальных категорий используем стандартную логику
     const from = currentCategory.units.find(u => u.id === fromUnit);
     const to = currentCategory.units.find(u => u.id === toUnit);
     
@@ -196,7 +232,7 @@ function UnitConverter({ onBack, onOpenSpec }: UnitConverterProps) {
     const converted = to.fromBase(baseValue);
     
     return formatNumber(converted);
-  }, [inputValue, fromUnit, toUnit, currentCategory]);
+  }, [inputValue, fromUnit, toUnit, currentCategory, selectedCategory, exchangeRates]);
 
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);
@@ -233,7 +269,7 @@ function UnitConverter({ onBack, onOpenSpec }: UnitConverterProps) {
           </div>
           <div className="flex items-center gap-2">
             <h1 className="text-lg font-semibold text-white">Конвертер единиц</h1>
-            <span className="text-[10px] text-gray-500 font-mono">v1.0.2</span>
+            <span className="text-[10px] text-gray-500 font-mono">v1.0.4</span>
           </div>
         </div>
       </header>
@@ -346,8 +382,13 @@ function UnitConverter({ onBack, onOpenSpec }: UnitConverterProps) {
               const to = currentCategory.units.find(u => u.id === toUnit);
               if (!from || !to) return null;
               
-              const baseValue = from.toBase(val);
-              const converted = to.fromBase(baseValue);
+              let converted: number;
+              if (selectedCategory === 'currency' && exchangeRates) {
+                converted = convertCurrency(val, fromUnit, toUnit, exchangeRates);
+              } else {
+                const baseValue = from.toBase(val);
+                converted = to.fromBase(baseValue);
+              }
               
               return (
                 <div
@@ -359,7 +400,7 @@ function UnitConverter({ onBack, onOpenSpec }: UnitConverterProps) {
                     {val} {from.symbol}
                   </span>
                   <span className="text-cyan-400 text-sm font-mono">
-                    = {formatNumber(converted)} {to.symbol}
+                    = {isNaN(converted) ? '—' : formatNumber(converted)} {to.symbol}
                   </span>
                 </div>
               );
@@ -367,19 +408,72 @@ function UnitConverter({ onBack, onOpenSpec }: UnitConverterProps) {
           </div>
         </div>
 
-        {/* Currency note */}
+        {/* Currency info */}
         {selectedCategory === 'currency' && (
-          <div className="mt-6 bg-amber-900/20 rounded-xl p-4 border border-amber-700/30">
-            <div className="flex items-start gap-3">
-              <span className="text-xl">⚠️</span>
-              <div>
-                <div className="text-amber-300 text-sm font-medium mb-1">Примечание о курсах валют</div>
-                <p className="text-amber-200/70 text-xs leading-relaxed">
-                  Курсы валют указаны ориентировочно и могут отличаться от актуальных рыночных курсов.
-                  Для точных расчётов используйте официальные данные банков.
-                  Курсы обновлены: январь 2026.
-                </p>
+          <div className="mt-6 bg-slate-800/50 rounded-xl p-4 border border-slate-700/30">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3 flex-1">
+                {ratesLoading ? (
+                  <>
+                    <div className="animate-spin text-xl">💱</div>
+                    <div>
+                      <div className="text-cyan-300 text-sm font-medium mb-1">Загрузка курсов...</div>
+                      <p className="text-slate-400 text-xs">Получаем актуальные курсы валют</p>
+                    </div>
+                  </>
+                ) : ratesError ? (
+                  <>
+                    <span className="text-xl">⚠️</span>
+                    <div>
+                      <div className="text-amber-300 text-sm font-medium mb-1">Ошибка загрузки</div>
+                      <p className="text-amber-200/70 text-xs leading-relaxed">
+                        {ratesError}. Используются резервные курсы.
+                      </p>
+                    </div>
+                  </>
+                ) : exchangeRates ? (
+                  <>
+                    <span className="text-xl">✅</span>
+                    <div className="flex-1">
+                      <div className="text-emerald-300 text-sm font-medium mb-1">
+                        Актуальные курсы валют
+                      </div>
+                      <p className="text-slate-400 text-xs leading-relaxed mb-2">
+                        Курсы получены автоматически и обновляются ежедневно.
+                        Базовая валюта: <span className="text-white font-medium">USD</span>
+                      </p>
+                      <div className="flex flex-wrap gap-3 text-xs">
+                        <div className="text-slate-500">
+                          📅 Дата курсов: <span className="text-slate-300">{formatDate(exchangeRates.date)}</span>
+                        </div>
+                        <div className="text-slate-500">
+                          🕐 Обновлено: <span className="text-slate-300">{getTimeSinceUpdate(exchangeRates.lastUpdated)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                ) : null}
               </div>
+              {exchangeRates && !ratesLoading && (
+                <button
+                  onClick={async () => {
+                    setRatesLoading(true);
+                    setRatesError(null);
+                    try {
+                      const rates = await fetchExchangeRates();
+                      setExchangeRates(rates);
+                    } catch (error) {
+                      setRatesError('Не удалось обновить курсы');
+                    } finally {
+                      setRatesLoading(false);
+                    }
+                  }}
+                  className="px-3 py-1.5 rounded-lg bg-cyan-600/20 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-600/30 transition-all text-xs font-medium whitespace-nowrap"
+                  title="Обновить курсы валют"
+                >
+                  🔄 Обновить
+                </button>
+              )}
             </div>
           </div>
         )}

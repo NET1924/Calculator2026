@@ -37,7 +37,7 @@ function Specification({ onBack }: SpecificationProps) {
 
           {/* Meta info */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-            <MetaCard label="Версия" value="1.0.3" />
+            <MetaCard label="Версия" value="1.0.4" />
             <MetaCard label="Платформа" value="Web (SPA)" />
             <MetaCard label="Стек" value="React + Vite" />
             <MetaCard label="Стили" value="Tailwind CSS" />
@@ -509,35 +509,55 @@ function Specification({ onBack }: SpecificationProps) {
             <li>Предупреждение об ориентировочных курсах валют</li>
           </ul>
 
-          <h3>7.4 Курсы валют</h3>
+          <h3>7.4 Курсы валют <span className="text-emerald-400 text-xs ml-2 font-normal">✨ NEW v1.0.4</span></h3>
           <p>
-            Курсы валют зафиксированы и указаны ориентировочно (обновлены: январь 2026).
-            Базовая валюта — доллар США (USD). Для актуальных курсов необходимо интегрировать
-            внешний API (планируется в будущих версиях).
+            В версии <strong>1.0.4</strong> реализована интеграция с API для получения актуальных
+            курсов валют. Курсы загружаются автоматически при открытии конвертера и кэшируются
+            на 24 часа в localStorage.
           </p>
+          
+          <h4 className="text-sm font-semibold text-gray-300 mt-4 mb-2">API интеграция:</h4>
+          <ul>
+            <li><strong>Источник:</strong> exchangerate-api.com (бесплатный API без регистрации)</li>
+            <li><strong>Базовая валюта:</strong> USD (доллар США)</li>
+            <li><strong>Частота обновления:</strong> ежедневно</li>
+            <li><strong>Кэширование:</strong> 24 часа в localStorage</li>
+            <li><strong>Таймаут запроса:</strong> 5 секунд</li>
+            <li><strong>Резервный режим:</strong> при недоступности API используются кэшированные или fallback-курсы</li>
+          </ul>
+
+          <h4 className="text-sm font-semibold text-gray-300 mt-4 mb-2">Поддерживаемые валюты:</h4>
           <div className="overflow-x-auto">
             <table>
               <thead>
                 <tr>
                   <th>Валюта</th>
                   <th>Код</th>
-                  <th>Курс к USD</th>
+                  <th>Символ</th>
                 </tr>
               </thead>
               <tbody>
-                <tr><td>Доллар США</td><td>USD</td><td>1.00</td></tr>
-                <tr><td>Евро</td><td>EUR</td><td>1.08</td></tr>
-                <tr><td>Российский рубль</td><td>RUB</td><td>92.50</td></tr>
-                <tr><td>Фунт стерлингов</td><td>GBP</td><td>1.27</td></tr>
-                <tr><td>Японская иена</td><td>JPY</td><td>156.50</td></tr>
-                <tr><td>Китайский юань</td><td>CNY</td><td>7.25</td></tr>
-                <tr><td>Швейцарский франк</td><td>CHF</td><td>1.13</td></tr>
-                <tr><td>Канадский доллар</td><td>CAD</td><td>0.74</td></tr>
-                <tr><td>Австралийский доллар</td><td>AUD</td><td>0.66</td></tr>
-                <tr><td>Турецкая лира</td><td>TRY</td><td>34.20</td></tr>
+                <tr><td>Доллар США</td><td>USD</td><td>$</td></tr>
+                <tr><td>Евро</td><td>EUR</td><td>€</td></tr>
+                <tr><td>Российский рубль</td><td>RUB</td><td>₽</td></tr>
+                <tr><td>Фунт стерлингов</td><td>GBP</td><td>£</td></tr>
+                <tr><td>Японская иена</td><td>JPY</td><td>¥</td></tr>
+                <tr><td>Китайский юань</td><td>CNY</td><td>¥</td></tr>
+                <tr><td>Швейцарский франк</td><td>CHF</td><td>Fr</td></tr>
+                <tr><td>Канадский доллар</td><td>CAD</td><td>C$</td></tr>
+                <tr><td>Австралийский доллар</td><td>AUD</td><td>A$</td></tr>
+                <tr><td>Турецкая лира</td><td>TRY</td><td>₺</td></tr>
               </tbody>
             </table>
           </div>
+
+          <h4 className="text-sm font-semibold text-gray-300 mt-4 mb-2">Интерфейс:</h4>
+          <ul>
+            <li>Индикатор загрузки курсов при первом открытии</li>
+            <li>Отображение даты курсов и времени последнего обновления</li>
+            <li>Кнопка «🔄 Обновить» для принудительного обновления курсов</li>
+            <li>Сообщение об ошибке при недоступности API с автоматическим переходом на резервные курсы</li>
+          </ul>
         </Section>
 
         {/* Section 8 - Комплексные числа */}
@@ -746,6 +766,11 @@ function Specification({ onBack }: SpecificationProps) {
               desc="10 категорий (длина, масса, время, температура, объём, площадь, скорость, давление, энергия, валюта), 70+ единиц СИ, конвертер валют с 10 основными валютами мира, быстрые конвертации, автоформатирование"
             />
             <RoadmapItem
+              status="done"
+              title="API курсов валют"
+              desc="Автоматическая загрузка актуальных курсов через exchangerate-api.com, кэширование на 24 часа в localStorage, резервный режим при недоступности API, отображение даты и времени обновления, кнопка принудительного обновления"
+            />
+            <RoadmapItem
               status="planned"
               title="Матричные операции"
               desc="Сложение, умножение, определитель, обратная матрица"
@@ -771,7 +796,7 @@ function Specification({ onBack }: SpecificationProps) {
         {/* Footer */}
         <footer className="mt-16 pt-8 border-t border-gray-700/30 text-center">
           <p className="text-gray-500 text-sm">
-            Спецификация научного калькулятора v1.0.3
+            Спецификация научного калькулятора v1.0.4
           </p>
           <p className="text-gray-600 text-xs mt-2">
             React 18 • TypeScript 5 • Vite 6 • Tailwind CSS 4
