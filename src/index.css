@@ -1,1 +1,53 @@
 @import "tailwindcss";
+
+/* Custom scrollbar */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Smooth transitions for buttons */
+button {
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Calculator display overflow */
+.overflow-x-auto {
+  scrollbar-width: none;
+}
+.overflow-x-auto::-webkit-scrollbar {
+  display: none;
+}
+
+/* Custom focus styles */
+button:focus {
+  outline: none;
+}
+button:focus-visible {
+  outline: 2px solid rgba(99, 102, 241, 0.5);
+  outline-offset: 2px;
+}
+
+/* Prevent text selection on double click */
+* {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Allow text selection in display */
+.font-mono {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Animation for button press */
+@keyframes press {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
