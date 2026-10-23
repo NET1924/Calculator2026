@@ -176,6 +176,13 @@ function UnitConverter({ onBack, onOpenSpec }: UnitConverterProps) {
     [selectedCategory]
   );
 
+  const formatNumber = (num: number): string => {
+    if (Math.abs(num) < 0.0001 || Math.abs(num) > 1e9) {
+      return num.toExponential(6);
+    }
+    return parseFloat(num.toFixed(10)).toString();
+  };
+
   const result = useMemo(() => {
     const value = parseFloat(inputValue);
     if (isNaN(value)) return '';
@@ -190,13 +197,6 @@ function UnitConverter({ onBack, onOpenSpec }: UnitConverterProps) {
     
     return formatNumber(converted);
   }, [inputValue, fromUnit, toUnit, currentCategory]);
-
-  const formatNumber = (num: number): string => {
-    if (Math.abs(num) < 0.0001 || Math.abs(num) > 1e9) {
-      return num.toExponential(6);
-    }
-    return parseFloat(num.toFixed(10)).toString();
-  };
 
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);
