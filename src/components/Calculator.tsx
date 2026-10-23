@@ -4,9 +4,10 @@ type AngleMode = 'deg' | 'rad';
 
 interface CalculatorProps {
   onOpenSpec: () => void;
+  onOpenConverter: () => void;
 }
 
-function Calculator({ onOpenSpec }: CalculatorProps) {
+function Calculator({ onOpenSpec, onOpenConverter }: CalculatorProps) {
   const [display, setDisplay] = useState('0');
   const [expression, setExpression] = useState('');
   const [angleMode, setAngleMode] = useState<AngleMode>('deg');
@@ -14,7 +15,6 @@ function Calculator({ onOpenSpec }: CalculatorProps) {
   const [isSecond, setIsSecond] = useState(false);
   const [history, setHistory] = useState<string[]>([]);
   const [lastKey, setLastKey] = useState<string | null>(null);
-  const [keyboardActive, setKeyboardActive] = useState(false);
   const keyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const toRadians = useCallback((value: number): number => {
@@ -354,7 +354,6 @@ function Calculator({ onOpenSpec }: CalculatorProps) {
 
     const flashKey = (key: string) => {
       setLastKey(key);
-      setKeyboardActive(true);
       if (keyTimeoutRef.current) {
         clearTimeout(keyTimeoutRef.current);
       }
@@ -420,20 +419,16 @@ function Calculator({ onOpenSpec }: CalculatorProps) {
           <div className="px-6 pt-5 pb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <h1 className="text-white/80 text-lg font-semibold">Научный Калькулятор</h1>
-              <span className="text-[10px] text-gray-500 font-mono">v1.0.1</span>
+              <span className="text-[10px] text-gray-500 font-mono">v1.0.2</span>
             </div>
             <div className="flex items-center gap-2">
-              <div
-                className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all duration-300 flex items-center gap-1 ${
-                  keyboardActive
-                    ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                    : 'bg-gray-700/30 text-gray-500 border border-gray-600/20'
-                }`}
-                title="Клавиатурный ввод активен"
+              <button
+                onClick={onOpenConverter}
+                className="px-3 py-1 rounded-lg text-xs font-bold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/30 transition-all"
+                title="Конвертер единиц"
               >
-                <span className={`inline-block w-1.5 h-1.5 rounded-full ${keyboardActive ? 'bg-green-400 animate-pulse' : 'bg-gray-600'}`}></span>
-                ⌨️ KB
-              </div>
+                🔄 CONV
+              </button>
               <button
                 onClick={onOpenSpec}
                 className="px-3 py-1 rounded-lg text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all"

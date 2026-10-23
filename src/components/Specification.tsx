@@ -18,7 +18,7 @@ function Specification({ onBack }: SpecificationProps) {
             <div className="h-6 w-px bg-gray-700"></div>
             <span className="text-gray-400 text-sm">Техническая документация</span>
           </div>
-          <div className="text-xs text-gray-500 font-mono">v1.0.1</div>
+          <div className="text-xs text-gray-500 font-mono">v1.0.2</div>
         </div>
       </header>
 
@@ -30,14 +30,14 @@ function Specification({ onBack }: SpecificationProps) {
               🧮
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">Научный Калькулятор</h1>
+              <h1 className="text-3xl font-bold text-white">Научный Калькулятор + Конвертер</h1>
               <p className="text-gray-400 text-sm mt-1">Техническая спецификация продукта</p>
             </div>
           </div>
 
           {/* Meta info */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-            <MetaCard label="Версия" value="1.0.1" />
+            <MetaCard label="Версия" value="1.0.2" />
             <MetaCard label="Платформа" value="Web (SPA)" />
             <MetaCard label="Стек" value="React + Vite" />
             <MetaCard label="Стили" value="Tailwind CSS" />
@@ -56,8 +56,9 @@ function Specification({ onBack }: SpecificationProps) {
             <TOCItem num="4" title="Математические функции" />
             <TOCItem num="5" title="Архитектура и технологии" />
             <TOCItem num="6" title="Обработка ошибок" />
-            <TOCItem num="7" title="Требования к совместимости" />
-            <TOCItem num="8" title="Дорожная карта" />
+            <TOCItem num="7" title="Конвертер единиц измерения" />
+            <TOCItem num="8" title="Требования к совместимости" />
+            <TOCItem num="9" title="Дорожная карта" />
           </div>
         </nav>
 
@@ -451,7 +452,93 @@ function Specification({ onBack }: SpecificationProps) {
         </Section>
 
         {/* Section 7 */}
-        <Section num="7" title="Требования к совместимости">
+        {/* Section 7 - Конвертер единиц */}
+        <Section num="7" title="Конвертер единиц измерения">
+          <p>
+            В версии <strong>1.0.2</strong> добавлен полнофункциональный конвертер единиц измерения,
+            доступный через кнопку <strong>🔄 CONV</strong> в шапке калькулятора. Конвертер поддерживает
+            10 категорий с более чем 70 единицами измерения.
+          </p>
+
+          <h3>7.1 Категории конвертера</h3>
+          <div className="overflow-x-auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>Категория</th>
+                  <th>Единиц</th>
+                  <th>Основные единицы</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>📏 Длина</td><td>11</td><td>м, км, см, мм, мкм, нм, миля, ярд, фут, дюйм, морская миля</td></tr>
+                <tr><td>⚖️ Масса</td><td>7</td><td>кг, г, мг, тонна, фунт, унция, карат</td></tr>
+                <tr><td>⏱️ Время</td><td>8</td><td>с, мс, мин, ч, день, неделя, месяц, год</td></tr>
+                <tr><td>🌡️ Температура</td><td>3</td><td>°C, °F, K</td></tr>
+                <tr><td>🧪 Объём</td><td>8</td><td>л, мл, м³, см³, галлон, пинта, чашка, жидкая унция</td></tr>
+                <tr><td>📐 Площадь</td><td>6</td><td>м², км², см², гектар, акр, фут²</td></tr>
+                <tr><td>🚀 Скорость</td><td>5</td><td>м/с, км/ч, миль/ч, узел, фут/с</td></tr>
+                <tr><td>🎈 Давление</td><td>7</td><td>Па, кПа, МПа, бар, атм, мм рт.ст., psi</td></tr>
+                <tr><td>⚡ Энергия</td><td>7</td><td>Дж, кДж, кал, ккал, Вт·ч, кВт·ч, эВ</td></tr>
+                <tr><td>💱 Валюта</td><td>10</td><td>USD, EUR, RUB, GBP, JPY, CNY, CHF, CAD, AUD, TRY</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>7.2 Алгоритм конвертации</h3>
+          <p>
+            Конвертация выполняется через базовую единицу каждой категории. Каждая единица имеет
+            две функции: <code>toBase</code> (конвертация в базовую) и <code>fromBase</code> (конвертация из базовой).
+          </p>
+          <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-700/30 font-mono text-sm my-4">
+            <div className="text-gray-400">// Алгоритм конвертации</div>
+            <div className="text-emerald-400">result = toUnit.fromBase(fromUnit.toBase(value))</div>
+            <div className="text-gray-400 mt-2">// Пример: 5 миль → км</div>
+            <div className="text-emerald-400">base = 5 × 1609.344 = 8046.72 м</div>
+            <div className="text-emerald-400">result = 8046.72 / 1000 = 8.04672 км</div>
+          </div>
+
+          <h3>7.3 Интерфейс конвертера</h3>
+          <ul>
+            <li>Сетка категорий: 2 колонки на мобильных, 5 колонок на десктопе</li>
+            <li>Кнопка <strong>⇄</strong> для быстрой смены направления конвертации</li>
+            <li>Блок «Быстрые конвертации» с предустановленными значениями (1, 5, 10, 100, 1000)</li>
+            <li>Автоматическое форматирование: обычные числа или научная нотация</li>
+            <li>Предупреждение об ориентировочных курсах валют</li>
+          </ul>
+
+          <h3>7.4 Курсы валют</h3>
+          <p>
+            Курсы валют зафиксированы и указаны ориентировочно (обновлены: январь 2026).
+            Базовая валюта — доллар США (USD). Для актуальных курсов необходимо интегрировать
+            внешний API (планируется в будущих версиях).
+          </p>
+          <div className="overflow-x-auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>Валюта</th>
+                  <th>Код</th>
+                  <th>Курс к USD</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Доллар США</td><td>USD</td><td>1.00</td></tr>
+                <tr><td>Евро</td><td>EUR</td><td>1.08</td></tr>
+                <tr><td>Российский рубль</td><td>RUB</td><td>92.50</td></tr>
+                <tr><td>Фунт стерлингов</td><td>GBP</td><td>1.27</td></tr>
+                <tr><td>Японская иена</td><td>JPY</td><td>156.50</td></tr>
+                <tr><td>Китайский юань</td><td>CNY</td><td>7.25</td></tr>
+                <tr><td>Швейцарский франк</td><td>CHF</td><td>1.13</td></tr>
+                <tr><td>Канадский доллар</td><td>CAD</td><td>0.74</td></tr>
+                <tr><td>Австралийский доллар</td><td>AUD</td><td>0.66</td></tr>
+                <tr><td>Турецкая лира</td><td>TRY</td><td>34.20</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </Section>
+
+        <Section num="8" title="Требования к совместимости">
           <h3>7.1 Браузеры</h3>
           <ul>
             <li>Chrome 90+ (рекомендуется)</li>
@@ -477,7 +564,7 @@ function Specification({ onBack }: SpecificationProps) {
         </Section>
 
         {/* Section 8 */}
-        <Section num="8" title="Дорожная карта (Roadmap)">
+        <Section num="9" title="Дорожная карта (Roadmap)">
           <h3>Планируемые улучшения:</h3>
           <div className="space-y-3">
             <RoadmapItem
@@ -496,9 +583,9 @@ function Specification({ onBack }: SpecificationProps) {
               desc="Визуализация математических функций на координатной плоскости"
             />
             <RoadmapItem
-              status="planned"
+              status="done"
               title="Конвертер единиц"
-              desc="Перевод между различными единицами измерения"
+              desc="10 категорий (длина, масса, время, температура, объём, площадь, скорость, давление, энергия, валюта), 70+ единиц СИ, конвертер валют с 10 основными валютами мира, быстрые конвертации, автоформатирование"
             />
             <RoadmapItem
               status="planned"
@@ -526,7 +613,7 @@ function Specification({ onBack }: SpecificationProps) {
         {/* Footer */}
         <footer className="mt-16 pt-8 border-t border-gray-700/30 text-center">
           <p className="text-gray-500 text-sm">
-            Спецификация научного калькулятора v1.0.1
+            Спецификация научного калькулятора v1.0.2
           </p>
           <p className="text-gray-600 text-xs mt-2">
             React 18 • TypeScript 5 • Vite 6 • Tailwind CSS 4
