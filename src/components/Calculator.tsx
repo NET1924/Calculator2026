@@ -5,9 +5,11 @@ type AngleMode = 'deg' | 'rad';
 interface CalculatorProps {
   onOpenSpec: () => void;
   onOpenConverter: () => void;
+  onOpenComplex: () => void;
+  onOpenGraph: () => void;
 }
 
-function Calculator({ onOpenSpec, onOpenConverter }: CalculatorProps) {
+function Calculator({ onOpenSpec, onOpenConverter, onOpenComplex, onOpenGraph }: CalculatorProps) {
   const [display, setDisplay] = useState('0');
   const [expression, setExpression] = useState('');
   const [angleMode, setAngleMode] = useState<AngleMode>('deg');
@@ -419,9 +421,23 @@ function Calculator({ onOpenSpec, onOpenConverter }: CalculatorProps) {
           <div className="px-6 pt-5 pb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <h1 className="text-white/80 text-lg font-semibold">Научный Калькулятор</h1>
-              <span className="text-[10px] text-gray-500 font-mono">v1.0.2</span>
+              <span className="text-[10px] text-gray-500 font-mono">v1.0.3</span>
             </div>
             <div className="flex items-center gap-2">
+              <button
+                onClick={onOpenComplex}
+                className="px-3 py-1 rounded-lg text-xs font-bold bg-purple-500/20 text-purple-400 border border-purple-500/30 hover:bg-purple-500/30 transition-all"
+                title="Комплексные числа"
+              >
+                ℂ CMPX
+              </button>
+              <button
+                onClick={onOpenGraph}
+                className="px-3 py-1 rounded-lg text-xs font-bold bg-pink-500/20 text-pink-400 border border-pink-500/30 hover:bg-pink-500/30 transition-all"
+                title="Графики функций"
+              >
+                📈 GRAPH
+              </button>
               <button
                 onClick={onOpenConverter}
                 className="px-3 py-1 rounded-lg text-xs font-bold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/30 transition-all"

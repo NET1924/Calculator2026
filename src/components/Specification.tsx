@@ -37,7 +37,7 @@ function Specification({ onBack }: SpecificationProps) {
 
           {/* Meta info */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-            <MetaCard label="Версия" value="1.0.2" />
+            <MetaCard label="Версия" value="1.0.3" />
             <MetaCard label="Платформа" value="Web (SPA)" />
             <MetaCard label="Стек" value="React + Vite" />
             <MetaCard label="Стили" value="Tailwind CSS" />
@@ -57,8 +57,10 @@ function Specification({ onBack }: SpecificationProps) {
             <TOCItem num="5" title="Архитектура и технологии" />
             <TOCItem num="6" title="Обработка ошибок" />
             <TOCItem num="7" title="Конвертер единиц измерения" />
-            <TOCItem num="8" title="Требования к совместимости" />
-            <TOCItem num="9" title="Дорожная карта" />
+            <TOCItem num="8" title="Комплексные числа" />
+            <TOCItem num="9" title="Графики функций" />
+            <TOCItem num="10" title="Требования к совместимости" />
+            <TOCItem num="11" title="Дорожная карта" />
           </div>
         </nav>
 
@@ -538,7 +540,163 @@ function Specification({ onBack }: SpecificationProps) {
           </div>
         </Section>
 
-        <Section num="8" title="Требования к совместимости">
+        {/* Section 8 - Комплексные числа */}
+        <Section num="8" title="Комплексные числа">
+          <p>
+            В версии <strong>1.0.3</strong> добавлен полнофункциональный модуль для работы
+            с комплексными числами, доступный через кнопку <strong>ℂ CMPX</strong>.
+            Модуль поддерживает все основные операции и функции над комплексными числами
+            с визуализацией на диаграмме Аргана.
+          </p>
+
+          <h3>8.1 Формат представления</h3>
+          <p>
+            Комплексное число представляется в алгебраической форме <code>z = a + bi</code>,
+            где <code>a</code> — действительная часть (Re), <code>b</code> — мнимая часть (Im),
+            <code>i</code> — мнимая единица.
+          </p>
+          <div className="overflow-x-auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>Формат ввода</th>
+                  <th>Пример</th>
+                  <th>Описание</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Полная форма</td><td><code>3 + 4i</code></td><td>Действительная + мнимая часть</td></tr>
+                <tr><td>Чисто мнимое</td><td><code>-2.5i</code></td><td>Только мнимая часть</td></tr>
+                <tr><td>Действительное</td><td><code>7</code></td><td>Только действительная часть</td></tr>
+                <tr><td>Единичный коэффициент</td><td><code>1 - i</code></td><td>Коэффициент 1 можно опустить</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>8.2 Операции</h3>
+          <div className="overflow-x-auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>Операция</th>
+                  <th>Обозначение</th>
+                  <th>Формула</th>
+                  <th>Тип</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Сложение</td><td>z₁ + z₂</td><td>(a₁+a₂) + (b₁+b₂)i</td><td>Бинарная</td></tr>
+                <tr><td>Вычитание</td><td>z₁ − z₂</td><td>(a₁−a₂) + (b₁−b₂)i</td><td>Бинарная</td></tr>
+                <tr><td>Умножение</td><td>z₁ × z₂</td><td>(a₁a₂−b₁b₂) + (a₁b₂+a₂b₁)i</td><td>Бинарная</td></tr>
+                <tr><td>Деление</td><td>z₁ ÷ z₂</td><td>(z₁·z̄₂) / |z₂|²</td><td>Бинарная</td></tr>
+                <tr><td>Степень</td><td>z₁ ^ z₂</td><td>exp(z₂ · ln(z₁))</td><td>Бинарная</td></tr>
+                <tr><td>Квадратный корень</td><td>√z</td><td>√r · e^(iθ/2)</td><td>Унарная</td></tr>
+                <tr><td>Экспонента</td><td>exp(z)</td><td>eᵃ(cos b + i sin b)</td><td>Унарная</td></tr>
+                <tr><td>Натуральный логарифм</td><td>ln(z)</td><td>ln|z| + i·arg(z)</td><td>Унарная</td></tr>
+                <tr><td>Синус</td><td>sin(z)</td><td>sin(a)cosh(b) + i·cos(a)sinh(b)</td><td>Унарная</td></tr>
+                <tr><td>Косинус</td><td>cos(z)</td><td>cos(a)cosh(b) − i·sin(a)sinh(b)</td><td>Унарная</td></tr>
+                <tr><td>Тангенс</td><td>tan(z)</td><td>sin(z) / cos(z)</td><td>Унарная</td></tr>
+                <tr><td>Модуль</td><td>|z|</td><td>√(a² + b²)</td><td>Унарная</td></tr>
+                <tr><td>Аргумент</td><td>arg(z)</td><td>atan2(b, a)</td><td>Унарная</td></tr>
+                <tr><td>Сопряжённое</td><td>z̄</td><td>a − bi</td><td>Унарная</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>8.3 Пользовательские функции</h3>
+          <p>
+            Поддерживается ввод произвольных выражений от <code>z</code> с использованием
+            всех доступных операций и функций. Парсер реализован как рекурсивный спуск
+            с поддержкой приоритетов операций.
+          </p>
+          <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-700/30 font-mono text-sm my-4">
+            <div className="text-gray-400">// Примеры выражений:</div>
+            <div className="text-emerald-400">z^2 + 1</div>
+            <div className="text-emerald-400">exp(z * i)</div>
+            <div className="text-emerald-400">sin(z) + cos(z)</div>
+            <div className="text-emerald-400">sqrt(z) * conj(z)</div>
+          </div>
+
+          <h3>8.4 Визуализация — диаграмма Аргана</h3>
+          <p>
+            Каждое комплексное число отображается как точка (или вектор) на комплексной плоскости.
+            Цветовая кодировка: <span className="text-blue-400">z₁ (синий)</span>,{' '}
+            <span className="text-amber-400">z₂ (жёлтый)</span>,{' '}
+            <span className="text-emerald-400">результат (зелёный)</span>.
+          </p>
+          <ul>
+            <li>Автоматическое масштабирование под значения</li>
+            <li>Сетка координат с подписями</li>
+            <li>Векторы от начала координат к точкам</li>
+            <li>Canvas-рендеринг с поддержкой Retina (devicePixelRatio)</li>
+          </ul>
+        </Section>
+
+        {/* Section 9 - Графики функций */}
+        <Section num="9" title="Графики функций">
+          <p>
+            В версии <strong>1.0.3</strong> добавлен модуль визуализации математических функций
+            на координатной плоскости, доступный через кнопку <strong>📈 GRAPH</strong>.
+            Поддерживается одновременное отображение нескольких функций с интерактивным
+            масштабированием и навигацией.
+          </p>
+
+          <h3>9.1 Поддерживаемые функции</h3>
+          <div className="overflow-x-auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>Категория</th>
+                  <th>Функции</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Тригонометрические</td><td><code>sin(x)</code>, <code>cos(x)</code>, <code>tan(x)</code></td></tr>
+                <tr><td>Обратные тригонометрические</td><td><code>asin(x)</code>, <code>acos(x)</code>, <code>atan(x)</code></td></tr>
+                <tr><td>Степенные</td><td><code>x^n</code>, <code>sqrt(x)</code>, <code>abs(x)</code></td></tr>
+                <tr><td>Логарифмические</td><td><code>ln(x)</code>, <code>log(x)</code>, <code>exp(x)</code></td></tr>
+                <tr><td>Константы</td><td><code>pi</code> (π), <code>e</code></td></tr>
+                <tr><td>Операторы</td><td><code>+ − * / ^</code>, скобки <code>( )</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>9.2 Интерактивность</h3>
+          <div className="overflow-x-auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>Действие</th>
+                  <th>Результат</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Перетаскивание мышью</td><td>Перемещение по координатной плоскости</td></tr>
+                <tr><td>Колесо мыши</td><td>Масштабирование (от 5 до 500 px/ед)</td></tr>
+                <tr><td>Наведение курсора</td><td>Перекрестие с координатами и значениями функций</td></tr>
+                <tr><td>Кнопка «Сбросить вид»</td><td>Возврат к исходному масштабу и позиции</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>9.3 Множественные функции</h3>
+          <ul>
+            <li>До 6 функций одновременно с уникальными цветами</li>
+            <li>Индивидуальное включение/выключение каждой функции</li>
+            <li>Быстрые пресеты (sin, cos, tan, x², x³, √x, 1/x, eˣ, ln, |x|)</li>
+            <li>Автоматическое обнаружение разрывов (для tan, 1/x)</li>
+          </ul>
+
+          <h3>9.4 Алгоритм отрисовки</h3>
+          <ol>
+            <li>Для каждого пикселя canvas вычисляется x в математических координатах</li>
+            <li>Выражение парсится и вычисляется через <code>Function constructor</code></li>
+            <li>При обнаружении скачка {'>'} 100 единиц — разрыв (не соединять точки)</li>
+            <li>Координатная сетка адаптируется к масштабу (шаг 0.25 / 0.5 / 1 / 5 / 10)</li>
+          </ol>
+        </Section>
+
+        <Section num="10" title="Требования к совместимости">
           <h3>7.1 Браузеры</h3>
           <ul>
             <li>Chrome 90+ (рекомендуется)</li>
@@ -564,7 +722,7 @@ function Specification({ onBack }: SpecificationProps) {
         </Section>
 
         {/* Section 8 */}
-        <Section num="9" title="Дорожная карта (Roadmap)">
+        <Section num="11" title="Дорожная карта (Roadmap)">
           <h3>Планируемые улучшения:</h3>
           <div className="space-y-3">
             <RoadmapItem
@@ -573,14 +731,14 @@ function Specification({ onBack }: SpecificationProps) {
               desc="Поддержка ввода с физической клавиатуры: цифры 0-9, операторы +−×÷, Enter/= для вычисления, Escape для очистки, Backspace для удаления, скобки, степень (^), факториал (!), процент (%) — с визуальной подсветкой нажатых кнопок"
             />
             <RoadmapItem
-              status="planned"
+              status="done"
               title="Комплексные числа"
-              desc="Поддержка мнимых чисел и операций с ними"
+              desc="Полная поддержка мнимых чисел: арифметические операции (+−×÷), тригонометрия (sin/cos/tan), экспонента/логарифм, степень/корень, модуль/аргумент/сопряжённое, пользовательские выражения f(z), диаграмма Аргана с визуализацией"
             />
             <RoadmapItem
-              status="planned"
+              status="done"
               title="Графики функций"
-              desc="Визуализация математических функций на координатной плоскости"
+              desc="Интерактивная визуализация на canvas: до 6 функций одновременно, перетаскивание/масштабирование, перекрестие с координатами, автообнаружение разрывов, пресеты, поддержка sin/cos/tan/sqrt/exp/ln/abs и произвольных выражений"
             />
             <RoadmapItem
               status="done"
@@ -613,7 +771,7 @@ function Specification({ onBack }: SpecificationProps) {
         {/* Footer */}
         <footer className="mt-16 pt-8 border-t border-gray-700/30 text-center">
           <p className="text-gray-500 text-sm">
-            Спецификация научного калькулятора v1.0.2
+            Спецификация научного калькулятора v1.0.3
           </p>
           <p className="text-gray-600 text-xs mt-2">
             React 18 • TypeScript 5 • Vite 6 • Tailwind CSS 4
