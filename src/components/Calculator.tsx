@@ -419,38 +419,35 @@ function Calculator({ onOpenSpec, onOpenConverter, onOpenComplex, onOpenGraph }:
         <div className="bg-gray-800/90 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-gray-700/50">
           {/* Header */}
           <div className="px-6 pt-5 pb-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <h1 className="text-white/80 text-lg font-semibold">Научный Калькулятор</h1>
-              <span className="text-[10px] text-gray-500 font-mono">v1.0.3</span>
-            </div>
-            <div className="flex items-center gap-2">
+            <h1 className="text-white/80 text-lg font-semibold">Научный Калькулятор</h1>
+            <div className="flex items-center gap-1.5">
               <button
                 onClick={onOpenComplex}
-                className="px-3 py-1 rounded-lg text-xs font-bold bg-purple-500/20 text-purple-400 border border-purple-500/30 hover:bg-purple-500/30 transition-all"
+                className="w-8 h-8 rounded-lg text-sm font-bold bg-purple-500/20 text-purple-400 border border-purple-500/30 hover:bg-purple-500/30 transition-all flex items-center justify-center"
                 title="Комплексные числа"
               >
-                ℂ CMPX
+                ℂ
               </button>
               <button
                 onClick={onOpenGraph}
-                className="px-3 py-1 rounded-lg text-xs font-bold bg-pink-500/20 text-pink-400 border border-pink-500/30 hover:bg-pink-500/30 transition-all"
+                className="w-8 h-8 rounded-lg text-sm bg-pink-500/20 text-pink-400 border border-pink-500/30 hover:bg-pink-500/30 transition-all flex items-center justify-center"
                 title="Графики функций"
               >
-                📈 GRAPH
+                📈
               </button>
               <button
                 onClick={onOpenConverter}
-                className="px-3 py-1 rounded-lg text-xs font-bold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/30 transition-all"
+                className="w-8 h-8 rounded-lg text-sm bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/30 transition-all flex items-center justify-center"
                 title="Конвертер единиц"
               >
-                🔄 CONV
+                🔄
               </button>
               <button
                 onClick={onOpenSpec}
-                className="px-3 py-1 rounded-lg text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all"
+                className="w-8 h-8 rounded-lg text-sm bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all flex items-center justify-center"
                 title="Открыть спецификацию"
               >
-                📄 SPEC
+                📄
               </button>
               <button
                 onClick={() => setAngleMode(angleMode === 'deg' ? 'rad' : 'deg')}
@@ -614,6 +611,11 @@ function Calculator({ onOpenSpec, onOpenConverter, onOpenComplex, onOpenGraph }:
               <Shortcut keys="% / ." action="Процент / Точка" />
             </div>
           </div>
+        </div>
+
+        {/* Version */}
+        <div className="mt-4 text-center">
+          <span className="text-[10px] text-gray-600 font-mono">v1.0.3</span>
         </div>
       </div>
     </div>
