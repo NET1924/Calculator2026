@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 
 type AngleMode = 'deg' | 'rad';
 
@@ -13,6 +13,9 @@ function Calculator({ onOpenSpec }: CalculatorProps) {
   const [memory, setMemory] = useState(0);
   const [isSecond, setIsSecond] = useState(false);
   const [history, setHistory] = useState<string[]>([]);
+  const [lastKey, setLastKey] = useState<string | null>(null);
+  const [keyboardActive, setKeyboardActive] = useState(false);
+  const keyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const toRadians = useCallback((value: number): number => {
     return angleMode === 'deg' ? (value * Math.PI) / 180 : value;
@@ -219,30 +222,195 @@ function Calculator({ onOpenSpec }: CalculatorProps) {
     setDisplay('0');
   };
 
+  // Keyboard input handler
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Prevent default for calculator keys
+      const key = e.key;
+
+      // Digits 0-9
+      if (/^[0-9]$/.test(key)) {
+        e.preventDefault();
+        handleNumber(key);
+        flashKey(key);
+        return;
+      }
+
+      // Decimal point
+      if (key === '.' || key === ',') {
+        e.preventDefault();
+        handleNumber('.');
+        flashKey('.');
+        return;
+      }
+
+      // Operators
+      if (key === '+') {
+        e.preventDefault();
+        handleOperator('+');
+        flashKey('+');
+        return;
+      }
+      if (key === '-') {
+        e.preventDefault();
+        handleOperator('−');
+        flashKey('-');
+        return;
+      }
+      if (key === '*' || key === 'x' || key === 'X') {
+        // Only treat 'x' as multiply if Shift is not pressed and it's not part of typing
+        if (key === '*' || e.shiftKey) {
+          e.preventDefault();
+          handleOperator('×');
+          flashKey('*');
+          return;
+        }
+      }
+      if (key === '/') {
+        e.preventDefault();
+        handleOperator('÷');
+        flashKey('/');
+        return;
+      }
+
+      // Enter or = → equals
+      if (key === 'Enter' || key === '=') {
+        e.preventDefault();
+        handleEquals();
+        flashKey('Enter');
+        return;
+      }
+
+      // Escape → clear all
+      if (key === 'Escape') {
+        e.preventDefault();
+        handleClear();
+        flashKey('Escape');
+        return;
+      }
+
+      // Backspace → delete last char
+      if (key === 'Backspace') {
+        e.preventDefault();
+        handleBackspace();
+        flashKey('Backspace');
+        return;
+      }
+
+      // Delete → clear entry
+      if (key === 'Delete') {
+        e.preventDefault();
+        handleClearEntry();
+        flashKey('Delete');
+        return;
+      }
+
+      // Percent
+      if (key === '%') {
+        e.preventDefault();
+        handlePercent();
+        flashKey('%');
+        return;
+      }
+
+      // Parentheses
+      if (key === '(') {
+        e.preventDefault();
+        setDisplay(display + '(');
+        flashKey('(');
+        return;
+      }
+      if (key === ')') {
+        e.preventDefault();
+        setDisplay(display + ')');
+        flashKey(')');
+        return;
+      }
+
+      // Power (^)
+      if (key === '^') {
+        e.preventDefault();
+        handlePower();
+        flashKey('^');
+        return;
+      }
+
+      // Factorial (!)
+      if (key === '!') {
+        e.preventDefault();
+        setDisplay(display + '!');
+        flashKey('!');
+        return;
+      }
+
+      // Square root (s key)
+      if (key === 's' || key === 'S') {
+        e.preventDefault();
+        handleFunction('√');
+        flashKey('√');
+        return;
+      }
+    };
+
+    const flashKey = (key: string) => {
+      setLastKey(key);
+      setKeyboardActive(true);
+      if (keyTimeoutRef.current) {
+        clearTimeout(keyTimeoutRef.current);
+      }
+      keyTimeoutRef.current = setTimeout(() => {
+        setLastKey(null);
+      }, 200);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      if (keyTimeoutRef.current) {
+        clearTimeout(keyTimeoutRef.current);
+      }
+    };
+  }, [display, expression, angleMode, memory, isSecond]);
+
+  const Shortcut = ({ keys, action }: { keys: string; action: string }) => (
+    <div className="flex items-center justify-between gap-2">
+      <kbd className="px-1.5 py-0.5 rounded bg-gray-700/60 text-gray-300 font-mono text-[10px] border border-gray-600/40 whitespace-nowrap">
+        {keys}
+      </kbd>
+      <span className="text-gray-500 text-[10px]">{action}</span>
+    </div>
+  );
+
   const Button = ({
     label,
     onClick,
     className = '',
-    span = 1
+    span = 1,
+    keyId
   }: {
     label: string;
     onClick: () => void;
     className?: string;
     span?: number;
-  }) => (
-    <button
-      onClick={onClick}
-      className={`
-        ${span === 2 ? 'col-span-2' : ''}
-        h-14 rounded-xl font-medium text-sm transition-all duration-150
-        active:scale-95 active:brightness-90
-        hover:brightness-110
-        ${className}
-      `}
-    >
-      {label}
-    </button>
-  );
+    keyId?: string;
+  }) => {
+    const isActive = keyId && lastKey === keyId;
+    return (
+      <button
+        onClick={onClick}
+        className={`
+          ${span === 2 ? 'col-span-2' : ''}
+          h-14 rounded-xl font-medium text-sm transition-all duration-150
+          active:scale-95 active:brightness-90
+          hover:brightness-110
+          ${isActive ? 'scale-95 brightness-125 ring-2 ring-indigo-400/50' : ''}
+          ${className}
+        `}
+      >
+        {label}
+      </button>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 flex items-center justify-center p-4">
@@ -250,8 +418,22 @@ function Calculator({ onOpenSpec }: CalculatorProps) {
         <div className="bg-gray-800/90 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-gray-700/50">
           {/* Header */}
           <div className="px-6 pt-5 pb-3 flex items-center justify-between">
-            <h1 className="text-white/80 text-lg font-semibold">Научный Калькулятор</h1>
             <div className="flex items-center gap-2">
+              <h1 className="text-white/80 text-lg font-semibold">Научный Калькулятор</h1>
+              <span className="text-[10px] text-gray-500 font-mono">v1.0.1</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div
+                className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all duration-300 flex items-center gap-1 ${
+                  keyboardActive
+                    ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                    : 'bg-gray-700/30 text-gray-500 border border-gray-600/20'
+                }`}
+                title="Клавиатурный ввод активен"
+              >
+                <span className={`inline-block w-1.5 h-1.5 rounded-full ${keyboardActive ? 'bg-green-400 animate-pulse' : 'bg-gray-600'}`}></span>
+                ⌨️ KB
+              </div>
               <button
                 onClick={onOpenSpec}
                 className="px-3 py-1 rounded-lg text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all"
@@ -355,33 +537,33 @@ function Calculator({ onOpenSpec }: CalculatorProps) {
 
             {/* Main buttons */}
             <div className="grid grid-cols-5 gap-1.5">
-              <Button label="CE" onClick={handleClearEntry} className="bg-red-900/30 text-red-400 border border-red-800/30" />
-              <Button label="C" onClick={handleClear} className="bg-red-900/30 text-red-400 border border-red-800/30" />
-              <Button label="⌫" onClick={handleBackspace} className="bg-gray-700/60 text-gray-300 border border-gray-600/30" />
-              <Button label="(" onClick={() => setDisplay(display + '(')} className="bg-gray-700/60 text-gray-300 border border-gray-600/30" />
-              <Button label=")" onClick={() => setDisplay(display + ')')} className="bg-gray-700/60 text-gray-300 border border-gray-600/30" />
+              <Button label="CE" onClick={handleClearEntry} keyId="Delete" className="bg-red-900/30 text-red-400 border border-red-800/30" />
+              <Button label="C" onClick={handleClear} keyId="Escape" className="bg-red-900/30 text-red-400 border border-red-800/30" />
+              <Button label="⌫" onClick={handleBackspace} keyId="Backspace" className="bg-gray-700/60 text-gray-300 border border-gray-600/30" />
+              <Button label="(" onClick={() => setDisplay(display + '(')} keyId="(" className="bg-gray-700/60 text-gray-300 border border-gray-600/30" />
+              <Button label=")" onClick={() => setDisplay(display + ')')} keyId=")" className="bg-gray-700/60 text-gray-300 border border-gray-600/30" />
 
-              <Button label="7" onClick={() => handleNumber('7')} className="bg-gray-700/80 text-white" />
-              <Button label="8" onClick={() => handleNumber('8')} className="bg-gray-700/80 text-white" />
-              <Button label="9" onClick={() => handleNumber('9')} className="bg-gray-700/80 text-white" />
-              <Button label="÷" onClick={() => handleOperator('÷')} className="bg-amber-600/80 text-white" />
+              <Button label="7" onClick={() => handleNumber('7')} keyId="7" className="bg-gray-700/80 text-white" />
+              <Button label="8" onClick={() => handleNumber('8')} keyId="8" className="bg-gray-700/80 text-white" />
+              <Button label="9" onClick={() => handleNumber('9')} keyId="9" className="bg-gray-700/80 text-white" />
+              <Button label="÷" onClick={() => handleOperator('÷')} keyId="/" className="bg-amber-600/80 text-white" />
               <Button label="±" onClick={handleNegate} className="bg-gray-700/60 text-gray-300 border border-gray-600/30" />
 
-              <Button label="4" onClick={() => handleNumber('4')} className="bg-gray-700/80 text-white" />
-              <Button label="5" onClick={() => handleNumber('5')} className="bg-gray-700/80 text-white" />
-              <Button label="6" onClick={() => handleNumber('6')} className="bg-gray-700/80 text-white" />
-              <Button label="×" onClick={() => handleOperator('×')} className="bg-amber-600/80 text-white" />
+              <Button label="4" onClick={() => handleNumber('4')} keyId="4" className="bg-gray-700/80 text-white" />
+              <Button label="5" onClick={() => handleNumber('5')} keyId="5" className="bg-gray-700/80 text-white" />
+              <Button label="6" onClick={() => handleNumber('6')} keyId="6" className="bg-gray-700/80 text-white" />
+              <Button label="×" onClick={() => handleOperator('×')} keyId="*" className="bg-amber-600/80 text-white" />
               <Button label="mod" onClick={() => handleOperator('%')} className="bg-gray-700/60 text-gray-300 border border-gray-600/30" />
 
-              <Button label="1" onClick={() => handleNumber('1')} className="bg-gray-700/80 text-white" />
-              <Button label="2" onClick={() => handleNumber('2')} className="bg-gray-700/80 text-white" />
-              <Button label="3" onClick={() => handleNumber('3')} className="bg-gray-700/80 text-white" />
-              <Button label="−" onClick={() => handleOperator('−')} className="bg-amber-600/80 text-white" />
-              <Button label="=" onClick={handleEquals} className="bg-blue-600 text-white row-span-2 h-full" />
+              <Button label="1" onClick={() => handleNumber('1')} keyId="1" className="bg-gray-700/80 text-white" />
+              <Button label="2" onClick={() => handleNumber('2')} keyId="2" className="bg-gray-700/80 text-white" />
+              <Button label="3" onClick={() => handleNumber('3')} keyId="3" className="bg-gray-700/80 text-white" />
+              <Button label="−" onClick={() => handleOperator('−')} keyId="-" className="bg-amber-600/80 text-white" />
+              <Button label="=" onClick={handleEquals} keyId="Enter" className="bg-blue-600 text-white row-span-2 h-full" />
 
-              <Button label="0" onClick={() => handleNumber('0')} className="bg-gray-700/80 text-white col-span-2" span={2} />
-              <Button label="." onClick={() => handleNumber('.')} className="bg-gray-700/80 text-white" />
-              <Button label="+" onClick={() => handleOperator('+')} className="bg-amber-600/80 text-white" />
+              <Button label="0" onClick={() => handleNumber('0')} keyId="0" className="bg-gray-700/80 text-white col-span-2" span={2} />
+              <Button label="." onClick={() => handleNumber('.')} keyId="." className="bg-gray-700/80 text-white" />
+              <Button label="+" onClick={() => handleOperator('+')} keyId="+" className="bg-amber-600/80 text-white" />
             </div>
           </div>
 
@@ -400,6 +582,27 @@ function Calculator({ onOpenSpec }: CalculatorProps) {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Keyboard shortcuts hint */}
+        <div className="mt-4 px-2">
+          <div className="bg-gray-800/40 rounded-xl p-3 border border-gray-700/20">
+            <div className="text-gray-500 text-[10px] uppercase tracking-wider mb-2 font-medium flex items-center gap-1.5">
+              <span>⌨️</span> Горячие клавиши
+            </div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px]">
+              <Shortcut keys="0-9" action="Цифры" />
+              <Shortcut keys="+ − × ÷" action="Операторы" />
+              <Shortcut keys="Enter / =" action="Вычислить" />
+              <Shortcut keys="Escape" action="Очистить (C)" />
+              <Shortcut keys="Backspace" action="Удалить символ" />
+              <Shortcut keys="Delete" action="Очистить ввод (CE)" />
+              <Shortcut keys="( )" action="Скобки" />
+              <Shortcut keys="^" action="Степень" />
+              <Shortcut keys="!" action="Факториал" />
+              <Shortcut keys="% / ." action="Процент / Точка" />
+            </div>
+          </div>
         </div>
       </div>
     </div>

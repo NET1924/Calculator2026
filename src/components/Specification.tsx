@@ -18,7 +18,7 @@ function Specification({ onBack }: SpecificationProps) {
             <div className="h-6 w-px bg-gray-700"></div>
             <span className="text-gray-400 text-sm">Техническая документация</span>
           </div>
-          <div className="text-xs text-gray-500 font-mono">v1.0.0</div>
+          <div className="text-xs text-gray-500 font-mono">v1.0.1</div>
         </div>
       </header>
 
@@ -37,7 +37,7 @@ function Specification({ onBack }: SpecificationProps) {
 
           {/* Meta info */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-            <MetaCard label="Версия" value="1.0.0" />
+            <MetaCard label="Версия" value="1.0.1" />
             <MetaCard label="Платформа" value="Web (SPA)" />
             <MetaCard label="Стек" value="React + Vite" />
             <MetaCard label="Стили" value="Tailwind CSS" />
@@ -228,6 +228,44 @@ function Specification({ onBack }: SpecificationProps) {
               </tbody>
             </table>
           </div>
+
+          <h3>2.8 Клавиатурный ввод <span className="text-emerald-400 text-xs ml-2 font-normal">✨ NEW v1.0.1</span></h3>
+          <p>
+            Приложение поддерживает полноценный ввод с физической клавиатуры. При нажатии клавиш
+            соответствующие кнопки на экране визуально подсвечиваются (эффект flash-анимации).
+            Индикатор <strong>⌨️ KB</strong> в шапке показывает активность клавиатурного ввода.
+          </p>
+          <div className="overflow-x-auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>Клавиша</th>
+                  <th>Действие</th>
+                  <th>Эквивалент кнопки</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>0</code> — <code>9</code></td><td>Ввод цифр</td><td>Кнопки 0-9</td></tr>
+                <tr><td><code>.</code> или <code>,</code></td><td>Десятичная точка</td><td>Кнопка .</td></tr>
+                <tr><td><code>+</code></td><td>Сложение</td><td>Кнопка +</td></tr>
+                <tr><td><code>-</code></td><td>Вычитание</td><td>Кнопка −</td></tr>
+                <tr><td><code>*</code></td><td>Умножение</td><td>Кнопка ×</td></tr>
+                <tr><td><code>/</code></td><td>Деление</td><td>Кнопка ÷</td></tr>
+                <tr><td><code>Enter</code> или <code>=</code></td><td>Вычислить результат</td><td>Кнопка =</td></tr>
+                <tr><td><code>Escape</code></td><td>Полная очистка</td><td>Кнопка C</td></tr>
+                <tr><td><code>Delete</code></td><td>Очистить ввод</td><td>Кнопка CE</td></tr>
+                <tr><td><code>Backspace</code></td><td>Удалить последний символ</td><td>Кнопка ⌫</td></tr>
+                <tr><td><code>(</code> и <code>)</code></td><td>Скобки</td><td>Кнопки ( )</td></tr>
+                <tr><td><code>^</code></td><td>Возведение в степень</td><td>Кнопка xⁿ</td></tr>
+                <tr><td><code>%</code></td><td>Процент</td><td>Кнопка %</td></tr>
+                <tr><td><code>!</code></td><td>Факториал</td><td>Кнопка n!</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="text-sm text-gray-400 mt-3">
+            <strong>Примечание:</strong> Клавиша <code>x</code> без Shift не интерпретируется как умножение,
+            чтобы избежать конфликтов при наборе текста. Используйте <code>*</code> для умножения.
+          </p>
         </Section>
 
         {/* Section 3 */}
@@ -443,9 +481,9 @@ function Specification({ onBack }: SpecificationProps) {
           <h3>Планируемые улучшения:</h3>
           <div className="space-y-3">
             <RoadmapItem
-              status="planned"
+              status="done"
               title="Клавиатурный ввод"
-              desc="Поддержка ввода с физической клавиатуры (цифры, операторы, Enter, Escape)"
+              desc="Поддержка ввода с физической клавиатуры: цифры 0-9, операторы +−×÷, Enter/= для вычисления, Escape для очистки, Backspace для удаления, скобки, степень (^), факториал (!), процент (%) — с визуальной подсветкой нажатых кнопок"
             />
             <RoadmapItem
               status="planned"
@@ -488,7 +526,7 @@ function Specification({ onBack }: SpecificationProps) {
         {/* Footer */}
         <footer className="mt-16 pt-8 border-t border-gray-700/30 text-center">
           <p className="text-gray-500 text-sm">
-            Спецификация научного калькулятора v1.0.0
+            Спецификация научного калькулятора v1.0.1
           </p>
           <p className="text-gray-600 text-xs mt-2">
             React 18 • TypeScript 5 • Vite 6 • Tailwind CSS 4
